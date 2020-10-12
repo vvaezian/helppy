@@ -27,6 +27,8 @@ hh.find('sql', 'pandas')
 hh.find(text_in_page='sql', subject='pandas')
 ```
 
-There is a pre-built knowledge-base included in the package. To use your own repositories as the knowledge-base, you can 
+There is a pre-built knowledge-base included in this package which uses my own documentations. To use your own repositories as the knowledge-base, you can 
 1- Use the `refresh_kb('my_repo_url)` function to load your repositories (lasts for the session)
 2- After adding your repositories, save the knowledge-base to a file using `save_kb()` function, forking this repository, and replacing the `kb.py` file with your file, and building a new package.
+
+Any GitHub path can be used for building the knowledge-base, doesn't have to be a repository path. 
