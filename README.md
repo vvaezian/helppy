@@ -18,7 +18,7 @@ hh = Helpy()
 
 ## Usage
 Search the knowledge-base by providing a keyword that appears in the header of the section in `.md` files, or search by providing a keyword that appears in the `.md` files.  
-In either case can optionally provide a keyword for `.md` file name (subject) to limit the search to those.
+In either case you can optionally provide a keyword for `.md` file name (subject) to limit the search to those files.
 ```python
 # Among all .md files that contain 'pandas' in their names, print sections that their headers contain 'sql'
 hh.find('sql', 'pandas')
