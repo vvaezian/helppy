@@ -2,7 +2,7 @@
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](https://github.com/vvaezian/helppy/issues)
 [![GitHub license](https://img.shields.io/github/license/vvaezian/helppy.svg)](https://github.com/vvaezian/helppy/blob/main/LICENCE)
 
-If you have Python-related documention in `.md` files in GitHub, Helppy helps you to search for them without the need to leave the Python notebook.
+If you have Python-related documention in `.md` files in GitHub, Helppy helps you to search for them without the need to leave your Python notebook.
 
 ## Installation
 ```python
