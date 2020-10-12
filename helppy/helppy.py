@@ -54,7 +54,7 @@ class Helppy:
   def find(self, header=None, subject=None, text_in_page=None, results_cap=3):
     '''Search the knowledge-base by providing a keyword that appears in the header of the section,
     or search by providing a keyword that appears in the page.
-    In either case can optionally provide a keyword for page name (subject) to limit the search to those pages.
+    In either case you can optionally provide a keyword for page name (subject) to limit the search to those pages.
     '''
     if (header is None and text_in_page is None) or (header and text_in_page):
       print("One of 'header' or 'text_in_page' arguments must to be provided.")
