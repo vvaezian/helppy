@@ -5,10 +5,10 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="helppy",
-    version="0.1.3",
+    version="0.1.4",
     author="Vahid Vaezian",
     author_email="vahid.vaezian@gmail.com",
-    description="Knowledge-Base from GitHub .md files",
+    description="Knowledge-Base from GitHub files",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/vvaezian/helppy",

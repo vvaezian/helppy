@@ -32,17 +32,17 @@ class Helppy:
     pickle.dump(self.kb, open(kb_name, 'wb'))
     
     
-  def refresh_KB(self, new_repo=None, replace_default_repo=True):
+  def refresh_KB(self, new_repo=None, replace_default_repo=True, extensions=['.md']):
     '''reload the topics of the knowledge-base in case there has been some changes.
        Can also add a new repository to the knowledge-base by passing the new repo url 
        and setting 'replace_default_repo=False'.
     '''
     repository = new_repo if new_repo else self.default_repo
-    seachTerms_and_links = self.get_seachTerms_and_links(repository)
+    searchTerms_and_links = self.get_searchTerms_and_links(repository, extensions=extensions)
     
     kb = {} if replace_default_repo else self.kb
     
-    for item in tqdm(seachTerms_and_links):
+    for item in tqdm(searchTerms_and_links):
       search_terms, page_url = item
       topics, page_body = self.process_page(self.get_raw_url(page_url))
       if topics != [] or page_body != '':
@@ -51,36 +51,36 @@ class Helppy:
     self.kb = kb
     
   
-  def find(self, header=None, subject=None, text_in_page=None, results_cap=3):
+  def find(self, header_keyword=None, page_path_keyword=None, page_body_keyword=None, results_cap=3):
     '''Search the knowledge-base by providing a keyword that appears in the header of the section,
-    or search by providing a keyword that appears in the page.
-    In either case you can optionally provide a keyword for page name (subject) to limit the search to those pages.
+       or search by providing a keyword that appears in the page.
+       In either case, you can optionally provide a keyword for page name (page_path_keyword) to limit the search to those pages.
     '''
-    if (header is None and text_in_page is None) or (header and text_in_page):
-      print("One of 'header' or 'text_in_page' arguments must to be provided.")
+    if (header_keyword is None and page_body_keyword is None) or (header_keyword and page_body_keyword):
+      print("One of 'header_keyword' or 'page_body_keyword' arguments must to be provided.")
       return
 
     counter = 0
-    if header:
-      for (url, subjects), (topics, page_body) in self.kb.items():
-        if not subject or subject.lower() in subjects:
+    if header_keyword:
+      for (url, page_path_keywords), (topics, page_body) in self.kb.items():
+        if not page_path_keyword or page_path_keyword.lower() in page_path_keywords:  # filter the results by page_path_keyword
           for topic in topics:
-            if header.lower() in topic.title.lower():
+            if header_keyword.lower() in topic.title.lower():
               counter += 1
               print(url + '#' + topic.title.replace(':', '').replace(' ','-') + '\n' + '#' * topic.header_size + ' ' + topic.title + '\n' + topic.body)
               if results_cap != 0 and counter >= results_cap:
                 print("\nBy default at most three results are shown. You can change it by passing a different number to the 'results_cap' parameter (pass 0 for no cap).")
                 break
 
-    else:  # text_in_page is provided instead of header
-      for (url, subjects), (topics, page_body) in self.kb.items():
-        if not subject or subject.lower() in subjects:
-          if text_in_page.lower() in page_body:
+    else:  # page_body_keyword is provided instead of header_keyword
+      for (url, page_path_keywords), (topics, page_body) in self.kb.items():
+        if not page_path_keyword or page_path_keyword.lower() in page_path_keywords:  # filter the results by page_path_keyword
+          if page_body_keyword.lower() in page_body:
             print(url)
 
 
-  def get_seachTerms_and_links(self, url, all_page_links=None):
-
+  def get_searchTerms_and_links(self, url, extensions, all_page_links=None):
+    '''recursively search through the repository and find links to pages that have the provided extensions, ignoring the README.md files'''
     if all_page_links is None:
       all_page_links = []
 
@@ -93,15 +93,17 @@ class Helppy:
 
     page_links = []
     for link in links:
-      if link.endswith('.md') and not link.lower().endswith('readme.md'):
-        sections_split = link.split('/')
-        sections = sections_split[2].lower().replace('-', ' ') + '/' + '/'.join(sections_split[5:]).lower().rstrip('.md').replace('-', ' ').replace('%20', ' ')
-        page_links.append( (sections, 'https://github.com' + link) ) 
+      for extension in extensions:
+        if link.endswith(extension) and not link.lower().endswith('readme.md'):
+          sections_split = link.split('/')
+          # links have this format :/[user]/[repo-name]/blob/master/[directory]/[file]
+          sections = sections_split[2].lower().replace('-', ' ') + '/' + '/'.join(sections_split[5:]).lower().rstrip(extension).replace('-', ' ').replace('%20', ' ')
+          page_links.append( (sections, 'https://github.com' + link) ) 
 
     all_page_links.extend(page_links)
 
     for url in dir_links:
-      self.get_seachTerms_and_links(url, all_page_links)
+      self.get_searchTerms_and_links(url, extensions, all_page_links)
 
     return all_page_links
   
@@ -132,12 +134,14 @@ class Helppy:
           # add the previous topic to topics
           topics.append(topic)
 
+        # create a new tipic
         topic = self.Topic()
+        # set the title properties of the topic
         topic.header_size = len(line) - len(line.lstrip('#'))
         topic.title = line.strip('#').strip(' ')
         any_header_detected_sofar = True
         continue
-
+      # create the body of the topic, line by line
       if any_header_detected_sofar:
         topic.add_to_body(line.strip(' ') + '\n')
 
