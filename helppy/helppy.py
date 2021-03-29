@@ -17,13 +17,15 @@ class Helppy:
       self.title = title
       self.body = body
       self.header_size = header_size  
+      self.is_sub_topic = False
+      self.sub_topics = []
     
     def add_to_body(self, line):
       self.body += line
   
   
   def load_KB(self):
-    '''load the pre-build knowledge-base'''
+    '''load the pre-built knowledge-base'''
     self.kb = pickle.load(open(knowledge_base_path, 'rb'))
   
   
@@ -33,7 +35,7 @@ class Helppy:
     
     
   def refresh_KB(self, new_repo=None, replace_default_repo=True, extensions=['.md']):
-    '''reload the topics of the knowledge-base in case there has been some changes.
+    '''reload the topics of the knowledge-base in case there have been some changes.
        Can also add a new repository to the knowledge-base by passing the new repo url 
        and setting 'replace_default_repo=False'.
     '''
@@ -67,7 +69,11 @@ class Helppy:
           for topic in topics:
             if header_keyword.lower() in topic.title.lower():
               counter += 1
+              # print the topic
               print(url + '#' + topic.title.replace(':', '').replace(' ','-') + '\n' + '#' * topic.header_size + ' ' + topic.title + '\n' + topic.body)
+              # print the sub-topics of the current topic (if any)
+              for sub_topic in topic.sub_topics:
+                print(url + '#' + sub_topic.title.replace(':', '').replace(' ','-') + '\n' + '#' * sub_topic.header_size + ' ' + sub_topic.title + '\n' + sub_topic.body)
               if results_cap != 0 and counter >= results_cap:
                 print("\nBy default at most three results are shown. You can change it by passing a different number to the 'results_cap' parameter (pass 0 for no cap).")
                 break
@@ -85,7 +91,7 @@ class Helppy:
       all_page_links = []
 
     res = requests.get(url)
-    soup = BeautifulSoup(res.text)
+    soup = BeautifulSoup(res.text, features="html.parser")
     rows = soup.findAll('div', {'role':'rowheader'})
     links = [ row.select('a')[0]['href'] for row in rows ]
 
@@ -148,5 +154,19 @@ class Helppy:
     # adding the last section
     if any_header_detected_sofar:
       topics.append(topic)
+
+    # handling the parent-child relationships
+    if len(topics) > 1:
+      
+      prev_topic = topics[0]
+      for cur_topic in topics[1:]:
+
+        if cur_topic.header_size < prev_topic.header_size:
+          prev_topic.sub_topics.append(cur_topic)
+          cur_topic.is_sub_topic = True  # currently this feature is not used.
+          # since it was a sub-topic we don't change the prev_topic variable
+        
+        else:
+          prev_topic = cur_topic
 
     return topics, res

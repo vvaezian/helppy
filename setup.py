@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="helppy",
-    version="0.1.4",
+    version="0.1.5",
     author="Vahid Vaezian",
     author_email="vahid.vaezian@gmail.com",
     description="Knowledge-Base from GitHub files",
