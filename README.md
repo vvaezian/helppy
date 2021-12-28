@@ -31,6 +31,6 @@ hh.find(text_in_page='sql', subject='pandas')
 
 There is a pre-built knowledge-base included in this package which uses my own documentations. To use your own repositories as the knowledge-base, you can 
 1. Use the `refresh_kb(my_repo_url, extensions=['.md'])` function to load your repositories (lasts for the session).
-2. After adding your repositories, save the knowledge-base to a file using `save_kb()` function, forke this repository, and replace the `kb.py` file with your file, and build a new package.
+2. After adding your repositories, save the knowledge-base to a file using `save_kb()` function, fork this repository, and replace the `kb.py` file with your file, and build a new package.
 
 Any GitHub path can be used for building the knowledge-base, doesn't have to be a repository path. 
